@@ -107,3 +107,17 @@ exports.createProduct = async (req, res) => {
     res.status(500).json({ message: "상품 등록 실패", error: error.message });
   }
 };
+//  실시간 인기 상품 조회 (고정된 5개)
+exports.getPopularProducts = async (req, res) => {
+  try {
+    const popularProducts = await Product.find()
+      //.sort({ soldCount: -1 }) // 판매량 내림차순 (또는 고정하고 싶으면 _id로 정렬)
+      .sort({ _id: -1 }) // _id: -1 (최신순/내림차순), _id: 1 (과거순/오름차순)
+      .limit(10);               // 딱 10개만
+
+    res.json(popularProducts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "인기 상품 조회 실패" });
+  }
+};

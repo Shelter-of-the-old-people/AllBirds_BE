@@ -8,6 +8,9 @@ const { isAdmin } = require('../middlewares/auth');
 // GET /api/products (목록 조회 & 필터링)
 router.get('/', productController.getAllProducts);
 
+//  실시간 인기 조회 
+router.get('/popular', productController.getPopularProducts);
+
 // GET /api/products/:id (상세 조회)
 router.get('/:id', productController.getProductById);
 
