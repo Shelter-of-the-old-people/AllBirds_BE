@@ -121,3 +121,35 @@ exports.getPopularProducts = async (req, res) => {
     res.status(500).json({ message: "인기 상품 조회 실패" });
   }
 };
+
+//상품 정보 수정 (할인율, 가용사이즈)
+exports.updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { discountRate, availableSizes } = req.body;
+
+    const updateData = {};
+    if (discountRate !== undefined) updateData.discountRate = Number(discountRate);
+    if (availableSizes) {
+      // 콤마로 구분된 문자열이면 배열로 변환, 아니면 그대로 사용
+      updateData.availableSizes = Array.isArray(availableSizes) 
+        ? availableSizes 
+        : availableSizes.split(',').map(Number);
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true } // 업데이트된 최신 정보 반환
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "상품을 찾을 수 없습니다." });
+    }
+
+    res.json({ message: "수정 완료", product: updatedProduct });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "상품 수정 실패" });
+  }
+};

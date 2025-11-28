@@ -14,7 +14,10 @@ router.get('/popular', productController.getPopularProducts);
 // GET /api/products/:id (상세 조회)
 router.get('/:id', productController.getProductById);
 
-// [신규] 상품 등록 (POST)
+// PUT /api/products/:id (상품 수정)
+router.put('/:id', isAdmin, productController.updateProduct);
+
+// 상품 등록 (POST)
 // upload.array('images', 5): 'images'라는 이름으로 최대 5장까지 받겠다는 뜻
 router.post('/', isAdmin, upload.array('images', 5), productController.createProduct);
     
