@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const { User, Product } = require('./models');
 
 // DB 연결
-mongoose.connect('mongodb://127.0.0.1:27017/Allbirds_DB')
+mongoose.connect('mongodb://localhost:27017/Allbirds_DB')
   .then(() => {
     console.log('DB 연결 성공, 데이터 주입을 시작합니다...');
     initData();
@@ -48,7 +48,7 @@ const initData = async () => {
         categories: ['lifestyle'], // 라이프스타일
         materials: ['wool'],       // 울 소재
         availableSizes: [250, 260, 270, 280],
-        images: ['/uploads/sample1_1.jpg', '/uploads/sample1_2.jpg'],
+        images: ['https://sfycdn.speedsize.com/4aadaad8-50d5-458f-88dd-2f364bf4d82e/allbirds.co.kr/cdn/shop/files/A12035_25Q3_Wool_Runner_NZ_Natural_White_Natural_White_Sole_PDP_LEFT.png?v=1754551667&width=4000', 'https://sfycdn.speedsize.com/4aadaad8-50d5-458f-88dd-2f364bf4d82e/allbirds.co.kr/cdn/shop/files/A12009_25Q3_Wool_Runner_NZ_Natural_Black_Natural_Black_Sole_PDP_LEFT.png?v=1754551830&width=4000'],
         description: '캐주얼, 비즈니스, 클래식 스니커즈'
       },
       {
