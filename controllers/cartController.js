@@ -1,5 +1,5 @@
 // controllers/cartController.js
-const { Cart } = require('../models');
+const { Cart, Product } = require('../models');
 
 // 1. 장바구니 조회 (GET)
 exports.getCart = async (req, res) => {
@@ -24,7 +24,19 @@ exports.getCart = async (req, res) => {
 exports.addToCart = async (req, res) => {
   try {
     const userId = req.session.user._id;
-    const { productId, size, quantity } = req.body; // 프론트에서 보낸 데이터
+    const { productId, size, quantity } = req.body;
+
+    // [신규] 상품 정보 먼저 조회 (이미지 가져오기 위해)
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "상품을 찾을 수 없습니다." });
+    }
+
+    // 대표 이미지 (첫 번째 이미지) 가져오기
+    // 이미지가 아예 없는 경우 대비해 기본값 설정 추천
+    const representativeImage = product.images && product.images.length > 0 
+      ? product.images[0] 
+      : '/uploads/default.png'; 
 
     // 1) 유저의 장바구니 찾기
     let cart = await Cart.findOne({ userId });
@@ -42,18 +54,21 @@ exports.addToCart = async (req, res) => {
     if (itemIndex > -1) {
       // 있다면 수량 증가
       cart.items[itemIndex].quantity += Number(quantity);
+      // (선택사항) 이미지 정보도 최신으로 업데이트
+      cart.items[itemIndex].selectedImage = representativeImage; 
     } else {
       // 없다면 새로 추가
       cart.items.push({ 
         productId, 
         size: Number(size), 
-        quantity: Number(quantity) 
+        quantity: Number(quantity),
+        selectedImage: representativeImage // [핵심] 여기에 이미지 저장!
       });
     }
 
     await cart.save();
     
-    // 저장 후 최신 장바구니 정보를 다시 보내줌 (프론트 갱신용)
+    // 저장 후 갱신된 정보 반환
     const updatedCart = await Cart.findOne({ userId }).populate('items.productId');
     res.json(updatedCart);
 
