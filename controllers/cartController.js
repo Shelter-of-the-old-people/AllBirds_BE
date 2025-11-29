@@ -24,51 +24,46 @@ exports.getCart = async (req, res) => {
 exports.addToCart = async (req, res) => {
   try {
     const userId = req.session.user._id;
-    const { productId, size, quantity } = req.body;
+    const { productId, size, quantity, selectedImage } = req.body;
 
-    // [신규] 상품 정보 먼저 조회 (이미지 가져오기 위해)
+    // 상품 유효성 체크
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "상품을 찾을 수 없습니다." });
     }
 
-    // 대표 이미지 (첫 번째 이미지) 가져오기
-    // 이미지가 아예 없는 경우 대비해 기본값 설정 추천
-    const representativeImage = product.images && product.images.length > 0 
-      ? product.images[0] 
-      : '/uploads/default.png'; 
+    // [핵심] 비교를 위해 저장될 이미지를 미리 확정합니다.
+    // 프론트에서 보낸 이미지가 있으면 그것을, 없으면 제품의 첫 번째 이미지를 사용
+    const targetImage = selectedImage || (product.images && product.images[0]);
 
-    // 1) 유저의 장바구니 찾기
     let cart = await Cart.findOne({ userId });
 
-    // 2) 장바구니가 없으면 새로 생성
     if (!cart) {
       cart = new Cart({ userId, items: [] });
     }
 
-    // 3) 이미 같은 상품(같은 사이즈)이 있는지 확인
+    // [수정] 이미 같은 상품인지 확인할 때 '이미지(selectedImage)'까지 비교합니다.
     const itemIndex = cart.items.findIndex(p => 
-      p.productId.toString() === productId && p.size === Number(size)
+      p.productId.toString() === productId && 
+      p.size === Number(size) &&
+      p.selectedImage === targetImage // 이미지가 다르면 다른 상품으로 취급
     );
 
     if (itemIndex > -1) {
-      // 있다면 수량 증가
+      // 모든 조건(ID, 사이즈, 이미지)이 같으면 수량만 증가
       cart.items[itemIndex].quantity += Number(quantity);
-      // (선택사항) 이미지 정보도 최신으로 업데이트
-      cart.items[itemIndex].selectedImage = representativeImage; 
     } else {
-      // 없다면 새로 추가
+      // 하나라도 다르면(예: 사이즈는 같은데 이미지가 다름) 새로 추가
       cart.items.push({ 
         productId, 
         size: Number(size), 
         quantity: Number(quantity),
-        selectedImage: representativeImage // [핵심] 여기에 이미지 저장!
+        selectedImage: targetImage 
       });
     }
 
     await cart.save();
     
-    // 저장 후 갱신된 정보 반환
     const updatedCart = await Cart.findOne({ userId }).populate('items.productId');
     res.json(updatedCart);
 
@@ -105,8 +100,8 @@ exports.removeFromCart = async (req, res) => {
 exports.updateCartItem = async (req, res) => {
   try {
     const userId = req.session.user._id;
-    const { itemId } = req.params; // 변경할 아이템의 _id (주소에서 가져옴)
-    const { quantity } = req.body; // 변경할 최종 수량 (Body에서 가져옴)
+    const { itemId } = req.params; // 변경할 아이템의 _id
+    const { quantity } = req.body; // 변경할 최종 수량
 
     if (quantity < 1) {
       return res.status(400).json({ message: "수량은 1개 이상이어야 합니다." });
@@ -121,7 +116,7 @@ exports.updateCartItem = async (req, res) => {
       return res.status(404).json({ message: "해당 아이템을 찾을 수 없습니다." });
     }
 
-    // 수량 덮어쓰기 (+= 가 아니라 = 입니다)
+    // 수량 덮어쓰기
     item.quantity = Number(quantity);
     
     await cart.save();
