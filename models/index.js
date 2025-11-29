@@ -30,7 +30,8 @@ const cartSchema = new Schema({
   items: [{
     productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     size: { type: Number, required: true },
-    quantity: { type: Number, default: 1 }
+    quantity: { type: Number, default: 1 },
+    selectedImage: { type: String } 
   }]
 }, { timestamps: true });
 
