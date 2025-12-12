@@ -43,7 +43,8 @@ const orderSchema = new Schema({
     name: { type: String }, 
     size: { type: Number },
     quantity: { type: Number },
-    price: { type: Number, required: true } // 결제 당시 금액
+    price: { type: Number, required: true },
+    image: { type: String }
   }],
   totalAmount: { type: Number, required: true },
   status: { type: String, default: 'paid' },

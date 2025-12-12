@@ -29,12 +29,15 @@ exports.createOrder = async (req, res) => {
       
       totalAmount += discountedPrice * item.quantity;
 
+      const orderImage = item.selectedImage || (product.images && product.images[0]);
+
       orderItems.push({
         productId: product._id,
-        name: product.name,        // 나중에 상품명 바뀌어도 주문 내역엔 남음
+        name: product.name,       
         size: item.size,
         quantity: item.quantity,
-        price: discountedPrice     // [핵심] 할인 적용된 확정 가격 저장
+        price: discountedPrice,
+        image: orderImage   
       });
 
       // 3) 상품 판매량(soldCount) 증가 (판매순 정렬 위해 필요)
