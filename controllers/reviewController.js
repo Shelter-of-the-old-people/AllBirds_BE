@@ -7,7 +7,7 @@ exports.createReview = async (req, res) => {
     }
 
     const userId = req.session.user._id;
-    const { productId, rating, content } = req.body;
+    const { productId, rating, content, title } = req.body;
 
     const hasPurchased = await Order.findOne({
       userId: userId,
@@ -28,6 +28,7 @@ exports.createReview = async (req, res) => {
       userId,
       productId,
       rating: Number(rating),
+      title,
       content
     });
 
@@ -71,11 +72,11 @@ exports.updateReview = async (req, res) => {
   try {
     const userId = req.session.user._id;
     const { reviewId } = req.params;
-    const { rating, content } = req.body;
+    const { rating, content, title } = req.body;
 
     const review = await Review.findOneAndUpdate(
       { _id: reviewId, userId }, 
-      { rating: Number(rating), content },
+      { rating: Number(rating), content, title },
       { new: true }
     );
 
