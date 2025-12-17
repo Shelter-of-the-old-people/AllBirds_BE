@@ -39,7 +39,7 @@ exports.getAllProducts = async (req, res) => {
     }
 
     // DB에서 조회
-    const products = await Product.find(filter).sort({ createdAt: -1 }); // 최신순 기본 정렬
+    const products = await Product.find(filter).sort({ createdAt: 1 });// 오래된 순서 정렬
 
     res.json(products);
   } catch (error) {
