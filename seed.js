@@ -119,7 +119,7 @@ const initData = async () => {
         
         ordersData.push({
             userId: getRandomUser(),
-            items: [{ productId: product._id, name: product.name, size: getRandomSize(product), quantity: qty, price: discountPrice }],
+            items: [{ productId: product._id, name: product.name, size: getRandomSize(product), quantity: qty, price: discountPrice, image: product.images[0] }],
             totalAmount: discountPrice * qty,
             status: 'paid',
             orderedAt: getDate(10, day) // 숫자 10 전달
@@ -136,7 +136,7 @@ const initData = async () => {
 
         ordersData.push({
             userId: getRandomUser(),
-            items: [{ productId: product._id, name: product.name, size: getRandomSize(product), quantity: qty, price: discountPrice }],
+            items: [{ productId: product._id, name: product.name, size: getRandomSize(product), quantity: qty, price: discountPrice, image: product.images[0] }],
             totalAmount: discountPrice * qty,
             status: 'paid',
             orderedAt: getDate(11, day) // 숫자 11 전달
@@ -153,7 +153,7 @@ const initData = async () => {
 
         ordersData.push({
             userId: getRandomUser(),
-            items: [{ productId: product._id, name: product.name, size: getRandomSize(product), quantity: qty, price: discountPrice }],
+            items: [{ productId: product._id, name: product.name, size: getRandomSize(product), quantity: qty, price: discountPrice, image: product.images[0] }],
             totalAmount: discountPrice * qty,
             status: 'paid',
             orderedAt: getDate(12, day) // 숫자 12 전달
